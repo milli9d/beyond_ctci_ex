@@ -1,63 +1,71 @@
-
-// Sort Valley Shaped Array
-// Prefix is sorted down
-// Suffix is sorted up
-// There will be non-empty prefix and suffix
-
 #include <vector>
+#include <algorithm>
 #include <iostream>
 
 #include <common.hpp>
 
-// void sort_valley_array(std::vector<int>& arr)
-// {
-//     // Find transition point
-//     size_t l = 0;
-//     size_t r = 1;
-
-//     while (arr[l] >= arr[r]) {
-//         l++;
-//         r++;
-//     }
-
-//     // now our pointers should be at transition point
-//     printf("L = %d R = %d\n", (int)l, (int)r);
-
-//     // we want to walk same as merge 2 sorted arrays
-
-// }
-
-void sort_valley_array(std::vector<int>& arr)
+// n-Way Merge Arrays
+std::vector<int> n_way_merge(std::vector<std::vector<int>> arrs)
 {
-    printf("To Sort: ");
-    print_vec<int>(arr);
+    std::vector<int> out = {};
 
-    // Find transition point
-    size_t l = 0;
-    size_t r = arr.size() - 1;
-
-    std::vector<int> out(arr.size());
-    int* out_ptr = &out.back();
-
-    // we want to walk same as merge 2 sorted arrays
-    while (l <= r) {
-        if (arr[l] > arr[r]) {
-            *out_ptr-- = arr[l];
-            l++;
-        } else {
-            *out_ptr-- = arr[r];
-            r--;
+    // at each iteration, look at the end of the arrays, compare these numbers, pop the max
+    while (1)
+    {
+        std::vector<std::pair<int, std::vector<int> *>> tails = {};
+        for (auto &arr : arrs)
+        {
+            if (!arr.empty())
+            {
+                tails.push_back({arr.back(), &arr});
+            }
         }
+
+        if (tails.empty())
+        {
+            break;
+        }
+
+        auto max_itr = std::max_element(tails.begin(), tails.end(), [](const auto &a, const auto &b)
+                                        { return a.first < b.first; });
+        auto arr_max = max_itr->second;
+
+        if (out.empty() || out.back() != max_itr->first)
+        {
+            out.push_back(max_itr->first);
+        }
+        arr_max->pop_back();
     }
 
-    printf("Sorted: ");
-    print_vec<int>(out);
+    std::reverse(out.begin(), out.end());
+
+    return out;
 }
 
 int main()
 {
-    std::vector<std::vector<int>> ins = { { 8, 4, 2, 6 }, { 92, 80, 70, 43, 20, 25, 46, 78 } };
-    for (auto arr: ins) {
-        sort_valley_array(arr);
+    for (int itr = 0; itr < 10; itr++)
+    {
+        std::vector<std::vector<int>> arrs = {};
+        size_t n_arrs = rand() % 20u;
+        printf("IN n_arrs = %d\n", (int)n_arrs);
+        for (int i = 0; i < (int)n_arrs; i++)
+        {
+            arrs.push_back(std::vector<int>());
+            size_t n_elems = rand() % 10u;
+            for (int j = 0; j < (int)n_elems; j++)
+            {
+                arrs.back().push_back(rand() % 50u);
+            }
+            std::sort(arrs.back().begin(), arrs.back().end());
+            print_vec<int>(arrs.back());
+        }
+
+        std::vector<int> out = n_way_merge(arrs);
+        printf("OUT\n");
+        print_vec<int>(out);
+        printf("\n\n\n");
     }
+
+    return 0;
 }
