@@ -4,6 +4,7 @@
 #include "freelist.hpp"
 #include "circ_buf.hpp"
 #include "buffer_pool.hpp"
+#include "linked_list.hpp"
 
 int main()
 {
